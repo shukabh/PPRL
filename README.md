@@ -24,15 +24,16 @@ To get started, follow these steps:
 Install the necessary packages using the following command:
 ```bash
 pip install -r requirements.txt
+```
 
 ### 2. Start the Server
 ```bash
 python server_socket.py
-
-### 2. Start the Server
+```
+### 3. Start the Client 
 ```bash
 python client_socket.py
-
+```
 On the server side we will see
 
 ```bash
@@ -47,7 +48,7 @@ Subquery protocol passed
 Main computation started...
 Cross tabulation time: 231.48 seconds
 Total processing time: 1078.02 seconds
-
+```
 
 On the client side we will see
 ```bash
@@ -65,5 +66,5 @@ Main computation started...
 3    qld  75.445471
 4     sa  73.142180
 5     wa  76.000000
-
+```
 
