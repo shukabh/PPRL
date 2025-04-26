@@ -15,10 +15,10 @@ The researcher wants to create a contingency table showing the **average income*
 The server cannot see the dataset of the client and cannot even know how many matches are made from its dataset. 
 
 ## Output Privacy
-The client cannot see the attributes of single individuals or a very small number of individuals. The resuls are summary statistics and should not reveal any personal information.
+The client cannot see the attributes of single individuals or a very small number of individuals. The results are summary statistics and should not reveal any personal information.
 
 ## Technique and threat model
-Input privacy is achieved by emplyoing homomorphic encryption. For output privacy as there is a possiblity of client being malicous to extract individual values the server devises a subquery size protocol which makes sure that client's queries if they turn out to be smaller than a threshold will be rejected by the server. 
+Input privacy is achieved by employing homomorphic encryption. For output privacy as there is a possiblity of client being malicous to extract individual values the server devises a subquery size protocol which makes sure that client's queries if they turn out to be smaller than a threshold will be rejected by the server. 
 
 ## Project Example
 
