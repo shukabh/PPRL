@@ -1,4 +1,4 @@
-# Secure Record Linkage Framework
+# Input Output Privacy Record Linkage Framework
 
 This project involves two parties: a **client** and a **server**, each possessing a dataset they are unwilling to share with one another. Despite this, the client needs to perform **record linkage** with the server's dataset and generate summary statistics from relevant columns of the server's data.
 
@@ -10,6 +10,15 @@ Consider the following example:
 - The **server** is an insurance agency holding a dataset with information about all citizens in the county.
 
 The researcher wants to create a contingency table showing the **average income** of HIV-infected patients by ethnicity. Using this framework of **homomorphic encryption**, the researcher can perform record linkage with the insurance agency's dataset and generate an **encrypted 2-way table**, which only the researcher can decrypt.
+
+## Input Privacy
+The server cannot see the dataset of the client and cannot even know how many matches are made from its dataset. 
+
+## Output Privacy
+The client cannot see the attributes of single individuals or a very small number of individuals. The resuls are summary statistics and should not reveal any personal information.
+
+## Technique and threat model
+Input privacy is achieved by emplyoing homomorphic encryption. For output privacy as there is a possiblity of client being malicous to extract individual values the server devises a subquery size protocol which makes sure that client's queries if they turn out to be smaller than a threshold will be rejected by the server. 
 
 ## Project Example
 
