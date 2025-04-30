@@ -4,11 +4,11 @@ import pickle
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
-
+from helpers import *
 
 payload_var='age'
 cross_tab_var='state'
-dname = 'df_fuzzy_names_10k_lsh200-50-100'
+dname = 'df_fuzzy_names_5k_lsh200-50-100'
 dataset2 = pd.read_pickle("dataset/"+ dname + ".pkl")
 
 #print(dataset2.head())
@@ -20,40 +20,6 @@ data_norms = np.array([x for x in sign_norms.to_numpy()])
 scaler = StandardScaler()
 data_norms_scaled = scaler.fit_transform(data_norms)
 
-
-def kmeans_dot_product(data, k, max_iterations=20, tol=1e-4):
-    #centroids = data[np.random.choice(range(len(data)), k, replace=False)]
-    
-    # Get cluster centroids (Slower but more precise)
-    kmeans = KMeans(n_clusters=k, init='k-means++', n_init=20)
-    kmeans.fit(data)
-    centroids = kmeans.cluster_centers_
-    
-    # Initialize centroids randomly (it runs faster, both results are little different.)
-    #centroids = data[np.random.choice(len(data), k, replace=False), :]
-    
-    labels = np.zeros(len(data))
-
-    for index in range(max_iterations):
-        #print(index)
-        # Assign each data point to the nearest centroid using dot product
-        distances = np.dot(data, centroids.T)
-        new_labels = np.argmax(distances, axis=1)
-        #print(new_labels)
-
-        # Check for convergence
-        if np.all(new_labels == labels):
-            break
-
-        # Update centroids
-        for i in range(k):
-            if np.sum(new_labels == i) > 0:
-                centroids[i, :] = np.mean(data[new_labels == i, :], axis=0)
-                #print(i, "update")
-
-        labels = new_labels
-
-    return centroids, labels
 
 
 # Example usage:
@@ -156,11 +122,6 @@ id_to_cross_tab_var = dict(zip(dataset2['ID'], dataset2[cross_tab_var].apply(lam
 # Initialize an empty array to store the payload values corresponding to the IDs
 cross_tab_array = np.vectorize(id_to_cross_tab_var.get)(cluster_dataset2_IDs.drop('Cluster_Id', axis=1).to_numpy())
 
-def to_float_or_zero(value):
-    try:
-        return value
-    except ValueError:
-        return 0.0
 
 # Vectorize the conversion function
 vectorized_to_float_or_zero = np.vectorize(to_float_or_zero)

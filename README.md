@@ -27,6 +27,11 @@ In this repository, we demonstrate the framework using a sample of **5000 reside
 ## Getting Started
 
 To get started, follow these steps:
+Start a virtual enviroment
+
+```bash
+python -m venv venv && source venv/bin/activate
+```
 
 ### 1. Install Dependencies  
 
@@ -76,4 +81,6 @@ Main computation started...
 4     sa  73.142180
 5     wa  76.000000
 ```
+
+
 
