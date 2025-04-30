@@ -86,7 +86,7 @@ Main computation started...
 
 
 
-## 📋 Process Overview
+## Process Overview
 
 ### 1. Data Import
 Both the client and server import their respective datasets.
@@ -148,7 +148,7 @@ Final aggregation of matched data using encrypted computation:
 
 ---
 
-## 🛡️ Key Features
+## Key Features
 
 - **Privacy-Preserving**: Matching and aggregation are performed without exposing raw data.
 - **Encrypted Communication**: Ensures that data is secure throughout the process.
@@ -167,7 +167,7 @@ Final aggregation of matched data using encrypted computation:
 
 ---
 
-## 📌 Use Cases
+## Use Cases
 
 - Collaborative research using sensitive datasets
 - Secure identity matching across institutions
@@ -175,7 +175,7 @@ Final aggregation of matched data using encrypted computation:
 
 ---
 
-## 📎 License
+## License
 
 MIT License
 
