@@ -10,8 +10,8 @@ from tqdm import tqdm
 # -------------------------------
 # Parameters
 # -------------------------------
-NO_OF_QUERIES = 1000
-THRESHOLD=0.8
+NO_OF_QUERIES = 5000
+THRESHOLD = 0.9
 # -------------------------------
 # Step 0: Load and preprocess client dataset
 # -------------------------------
@@ -27,7 +27,7 @@ signatures_200 = np.array(dataset['Signature_Norm-200'].tolist())
 scaled_signatures = scaler.fit_transform(signatures_200)
 
 # Extract query IDs and the 50-dimensional signature vectors
-query_ids = dataset['ID'].to_numpy()
+query_IDs = dataset['ID'].to_numpy()
 signatures_50 = np.array(dataset['Signature_Norm-50'].tolist())
 
 # -------------------------------
@@ -97,69 +97,74 @@ for _ in tqdm(range(max_cluster_size)):
 res = np.array(res).T
 res[res > 1.01] = 0  # Threshold cleanup
 
-print("Subquery protocol started...")
-#things to consider in next round; how to deal with low threshold matches; how to deal with multiple mathces (less of an issue)
-# -------------------------------
-# Step 8: Build binary payload vector from record linkage result
-# -------------------------------
 cluster_ids = recv_data(client_socket)
 id_candidates = [cluster_ids[most_matching_cluster[i]][np.argmax(res[i])] for i in range(NO_OF_QUERIES)]
-payload_mask = np.isin(cluster_ids, id_candidates).astype(int)
+
+fuzzy_query_IDs = recv_data(client_socket)
+querier_IDs = query_IDs[0:NO_OF_QUERIES]
+
+#print(id_candidates)
+'''
+TP = 0
+FP = 0
+TN = 0
+FN = 0
+
+for i in range(NO_OF_QUERIES):
+    most_matching_cs_index = np.argmax(res[i])
+    if res[i][most_matching_cs_index] > THRESHOLD: #checks if RL sim is above threshold contributes to TP or FP
+        if querier_IDs[i] == id_candidates[i]:
+            TP += 1
+        else:
+            FP += 1
+    else: #if score is less than threshold contributes to TN or FN
+        if querier_IDs[i] in fuzzy_query_IDs:
+            FN += 1
+        else:
+            TN += 1
+'''
 
 
-counter=0
-for i in range(len(res)):
-    if max(res[i])<=THRESHOLD:
-        counter +=1
+TP = 0
+FP = 0
+TN = 0
+FN = 0
 
-print("Values below threshold: ",counter)
+for i in range(NO_OF_QUERIES):
+    most_matching_cs_index = np.argmax(res[i])
+    similarity_score = res[i][most_matching_cs_index]
+    predicted_match = similarity_score > THRESHOLD
+    true_match = querier_IDs[i] == id_candidates[i]
 
-# Send encrypted payload vectors to server
-for i in range(max_cluster_size):
-    enc_vec = ts.ckks_tensor(context, payload_mask[:, i])
-    send_data(client_socket, enc_vec.serialize())
+    if predicted_match:
+        if true_match:
+            TP += 1
+        else:
+            FP += 1
+    else:
+        if true_match:
+            FN += 1
+        else:
+            TN += 1
 
-#print("Sent encrypted payload mask.")
+# Precision, Recall, F1-Score
+precision = TP / (TP + FP) if (TP + FP) > 0 else 0
+recall = TP / (TP + FN) if (TP + FN) > 0 else 0
+f1_score = (2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
 
-# -------------------------------
-# Step 9: Receive and decrypt sub-query sizes
-# -------------------------------
-dec_subquery_sizes = []
-n = recv_data(client_socket)
+# Output
+print("Threshold: ", THRESHOLD)
+print("No of queries: ",NO_OF_QUERIES)
+print(f"True Positives: {TP}")
+print(f"False Positives: {FP}")
+print(f"True Negatives: {TN}")
+print(f"False Negatives: {FN}")
+print(f"Precision: {precision:.4f}")
+print(f"Recall: {recall:.4f}")
+print(f"F1 Score: {f1_score:.4f}")
 
-for _ in range(n):
-    vec_bytes = recv_data(client_socket)
-    vec = ts.ckks_vector_from(context, vec_bytes)
-    dec_subquery_sizes.append(vec.decrypt()[0])
 
-# Send decrypted sub-query sizes back to server
-send_data(client_socket, dec_subquery_sizes)
 
-# -------------------------------
-# Step 10: Receive final ratios from server
-# -------------------------------
-print("Main computation started...")
-keys, ratios = [], []
-#counts = []
-num_keys = recv_data(client_socket)
 
-for _ in range(num_keys):
-    key = str(recv_data(client_socket))
-    num = ts.ckks_vector_from(context, recv_data(client_socket)).decrypt()[0]
-    den = ts.ckks_vector_from(context, recv_data(client_socket)).decrypt()[0]
-    #counts.append(den)
-    ratio = num / den if den != 0 else 0
-    keys.append(key)
-    ratios.append(ratio)
 
-# -------------------------------
-# Step 11: Output results in a DataFrame
-# -------------------------------
-df_ratios = pd.DataFrame({'key': keys, 'average': ratios})
-#df_ratios['Count'] = counts
-print(df_ratios)
-df_ratios.to_csv('out/results_' + str(NO_OF_QUERIES) + '.csv')
-# -------------------------------
-# Step 12: Close the socket
-# -------------------------------
 client_socket.close()

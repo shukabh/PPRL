@@ -243,5 +243,5 @@ fuzzy_names_filename = f"df_fuzzy_names_10k_lsh200-50-100.pkl"
 df_names.to_pickle('dataset/' + exact_names_filename)
 df_fuzzy_names.to_pickle('dataset/' + fuzzy_names_filename)
 
-print(df_names.head())
-print(df_fuzzy_names.head())
+#print(df_names.head())
+#print(df_fuzzy_names.head())
