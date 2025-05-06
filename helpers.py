@@ -70,3 +70,38 @@ def create_context():
     context.global_scale = global_scale
 
     return context
+
+def kmeans_dot_product(data, k, max_iterations=20, tol=1e-4):
+    #centroids = data[np.random.choice(range(len(data)), k, replace=False)]
+    
+    # Get cluster centroids (Slower but more precise)
+    kmeans = KMeans(n_clusters=k, init='k-means++', n_init=20)
+    kmeans.fit(data)
+    centroids = kmeans.cluster_centers_
+    
+    # Initialize centroids randomly (it runs faster, both results are little different.)
+    #centroids = data[np.random.choice(len(data), k, replace=False), :]
+    
+    labels = np.zeros(len(data))
+
+    for index in range(max_iterations):
+        #print(index)
+        # Assign each data point to the nearest centroid using dot product
+        distances = np.dot(data, centroids.T)
+        new_labels = np.argmax(distances, axis=1)
+        #print(new_labels)
+
+        # Check for convergence
+        if np.all(new_labels == labels):
+            break
+
+        # Update centroids
+        for i in range(k):
+            if np.sum(new_labels == i) > 0:
+                centroids[i, :] = np.mean(data[new_labels == i, :], axis=0)
+                #print(i, "update")
+
+        labels = new_labels
+
+    return centroids, labels
+

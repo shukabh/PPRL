@@ -139,9 +139,8 @@ import time
 import psutil
 import pickle
 
-df1['Full Name'] = df1['Full Name'].str.lower()
-#df2['Full Name'] = df2['Full Name'].str.lower()
-df2['Fuzzy Full Name'] = df2['Fuzzy Full Name'].str.lower()
+df1=pd.read_csv('dataset/client_df.csv')
+df2=pd.read_csv('dataset/server_df.csv')
 
 #Parameters
 shingle_size = 3
@@ -184,7 +183,6 @@ def compute_minhash_signature(shingles, permutation_functions):
     return signature
 
 permutation_functions = generate_permutation_function(num_permutations, max_hash)
-
 permutation_functions2 = generate_permutation_function(num_permutations2, max_hash)
 permutation_functions3 = generate_permutation_function(num_permutations3, max_hash)
 
@@ -237,8 +235,8 @@ signatures_at_responser3 = df_fuzzy_names['Fuzzy Signature-100'].to_numpy()
 signatures_at_responser3 = np.array([vec/np.linalg.norm(vec) for vec in signatures_at_responser3])
 df_fuzzy_names.insert(8, 'Fuzzy Signature_Norm-100', signatures_at_responser3.tolist())
 
-exact_names_filename = f"df_names_10k_lsh200-50-100.pkl"
-fuzzy_names_filename = f"df_fuzzy_names_10k_lsh200-50-100.pkl"
+exact_names_filename = f"client_names_5k_lsh200-50-100.pkl"
+fuzzy_names_filename = f"server_fuzzy_names_5k_lsh200-50-100.pkl"
 
 df_names.to_pickle('dataset/' + exact_names_filename)
 df_fuzzy_names.to_pickle('dataset/' + fuzzy_names_filename)
